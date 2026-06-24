@@ -1,4 +1,8 @@
 pub mod app;
+pub mod timer;
+pub mod settings;
+pub mod views;
+pub mod event;
 
 use app::Pomodoro;
 
