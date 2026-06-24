@@ -1,17 +1,17 @@
 use std::io;
 
+use crate::settings::SettingsState;
+use crate::timer::TimerState;
+use crate::views;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
+    DefaultTerminal, Frame,
     buffer::Buffer,
     layout::Rect,
     style::Stylize,
     text::{Line, Text},
     widgets::{Block, Paragraph, Widget},
-    DefaultTerminal, Frame,
 };
-use crate::settings::SettingsState;
-use crate::timer::TimerState;
-use crate::views;
 
 #[derive(Debug, Default)]
 pub struct Pomodoro {

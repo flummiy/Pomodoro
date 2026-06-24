@@ -1,13 +1,13 @@
-use crossterm::event::{KeyCode, KeyEvent};
-use ratatui::{
-    layout::{Constraint, Direction, Layout},
-    style::{Modifier, Style, Stylize},
-    text::{Line, Span},
-    widgets::{Block, Borders, List, ListItem, Paragraph},
-    Frame,
-};
 use crate::app::Pomodoro;
 use crate::settings::SettingsState;
+use crossterm::event::{KeyCode, KeyEvent};
+use ratatui::{
+    Frame,
+    layout::{Constraint, Direction, Layout},
+    style::{Modifier, Style, Stylize},
+    text::{Line, Span, Text},
+    widgets::{Block, Borders, Paragraph},
+};
 
 pub fn handle_key(app: &mut Pomodoro, key: KeyEvent) {
     match key.code {
@@ -22,67 +22,52 @@ pub fn handle_key(app: &mut Pomodoro, key: KeyEvent) {
 pub fn draw(frame: &mut Frame, settings: &SettingsState) {
     let area = frame.area();
 
-    let block = Block::default()
-        .title(" Settings ")
-        .borders(Borders::ALL);
+    let block = Block::default().title(" Settings ").borders(Borders::ALL);
 
     let layout = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Min(3),
-            Constraint::Length(3),
-        ])
+        .constraints([Constraint::Min(3), Constraint::Length(3)])
         .split(area);
 
-    let items = vec![
-        setting_item(
-            settings,
-            0,
-            "Work duration",
-            settings.work_minutes,
-        ),
-        setting_item(
-            settings,
-            1,
-            "Short break",
-            settings.short_break_minutes,
-        ),
-        setting_item(
-            settings,
-            2,
-            "Long break",
-            settings.long_break_minutes,
-        ),
-    ];
+    let settings_text = Text::from(vec![
+        setting_line(settings, 0, "Work duration", settings.work_minutes),
+        setting_line(settings, 1, "Short break", settings.short_break_minutes),
+        setting_line(settings, 2, "Long break", settings.long_break_minutes),
+    ]);
 
-    let list = List::new(items)
-        .block(block)
-        .highlight_symbol("> ");
-
-    frame.render_widget(list, layout[0]);
+    frame.render_widget(
+        Paragraph::new(settings_text).centered().block(block),
+        layout[0],
+    );
 
     let help = Paragraph::new(Line::from(vec![
         Span::raw("Move "),
-        Span::styled("↑/↓ or j/k", Style::new().blue().add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "↑/↓ or j/k",
+            Style::new().blue().add_modifier(Modifier::BOLD),
+        ),
         Span::raw("  Change "),
-        Span::styled("←/→ or h/l", Style::new().blue().add_modifier(Modifier::BOLD)),
+        Span::styled(
+            "←/→ or h/l",
+            Style::new().blue().add_modifier(Modifier::BOLD),
+        ),
         Span::raw("  Timer "),
         Span::styled("t", Style::new().blue().add_modifier(Modifier::BOLD)),
         Span::raw("  Quit "),
         Span::styled("q", Style::new().blue().add_modifier(Modifier::BOLD)),
     ]))
-        .centered()
-        .block(Block::bordered());
+    .centered()
+    .block(Block::bordered());
 
     frame.render_widget(help, layout[1]);
 }
 
-fn setting_item(settings: &SettingsState, index: usize, label: &str, value: u64) -> ListItem<'static> {
+fn setting_line(settings: &SettingsState, index: usize, label: &str, value: u64) -> Line<'static> {
     let text = format!("{label}: {value} min");
 
     if settings.selected == index {
-        ListItem::new(format!("> {text}").yellow().bold())
+        Line::from(format!("> {text}").yellow().bold())
     } else {
-        ListItem::new(text)
+        Line::from(text)
     }
 }
