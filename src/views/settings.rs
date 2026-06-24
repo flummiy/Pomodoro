@@ -13,8 +13,22 @@ pub fn handle_key(app: &mut Pomodoro, key: KeyEvent) {
     match key.code {
         KeyCode::Up | KeyCode::Char('k') => app.settings.previous(),
         KeyCode::Down | KeyCode::Char('j') => app.settings.next(),
-        KeyCode::Left | KeyCode::Char('h') => app.settings.decrease_selected(),
-        KeyCode::Right | KeyCode::Char('l') => app.settings.increase_selected(),
+        KeyCode::Left | KeyCode::Char('h') => {
+            app.settings.decrease_selected();
+            app.timer.set_duration_if_not_started(
+                app.settings.work_minutes,
+                app.settings.short_break_minutes,
+                app.settings.long_break_minutes,
+            );
+        }
+        KeyCode::Right | KeyCode::Char('l') => {
+            app.settings.increase_selected();
+            app.timer.set_duration_if_not_started(
+                app.settings.work_minutes,
+                app.settings.short_break_minutes,
+                app.settings.long_break_minutes,
+            );
+        }
         _ => {}
     }
 }
@@ -53,6 +67,8 @@ pub fn draw(frame: &mut Frame, settings: &SettingsState) {
         ),
         Span::raw("  Timer "),
         Span::styled("t", Style::new().blue().add_modifier(Modifier::BOLD)),
+        Span::raw("  Reset "),
+        Span::styled("r", Style::new().blue().add_modifier(Modifier::BOLD)),
         Span::raw("  Quit "),
         Span::styled("q", Style::new().blue().add_modifier(Modifier::BOLD)),
     ]))

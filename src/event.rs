@@ -8,6 +8,7 @@ impl Pomodoro {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Char('t') => self.active_view = View::Timer,
             KeyCode::Char('s') => self.active_view = View::Settings,
+            KeyCode::Char('r') => self.timer.reset(self.settings.work_minutes),
             _ => match self.active_view {
                 View::Timer => views::timer::handle_key(self, key_event),
                 View::Settings => views::settings::handle_key(self, key_event),
