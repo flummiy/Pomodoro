@@ -1,4 +1,5 @@
 pub mod app;
+pub mod completion_alert;
 pub mod event;
 pub mod settings;
 pub mod timer;

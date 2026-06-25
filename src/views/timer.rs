@@ -4,7 +4,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use figlet_rs::FIGlet;
 use ratatui::{
     Frame,
-    layout::{Alignment, Constraint, Direction, Layout, Rect},
+    layout::{Alignment, Constraint, Direction, Layout},
     style::{Modifier, Style, Stylize},
     text::{Line, Span, Text},
     widgets::{Block, Paragraph},
@@ -44,7 +44,15 @@ pub fn draw(frame: &mut Frame, timer: &TimerState) {
         ),
     ]));
 
-    let timer_content_area = centered_vertically(timer_area, timer_lines.len() as u16);
+    let timer_width = timer_lines
+        .iter()
+        .map(Line::width)
+        .max()
+        .unwrap_or_default()
+        .min(timer_area.width as usize) as u16;
+    let timer_height = (timer_lines.len() as u16).min(timer_area.height);
+    let timer_content_area =
+        timer_area.centered(Constraint::Length(timer_width), Constraint::Length(timer_height));
     let timer_text = Text::from(timer_lines);
 
     let timer = Paragraph::new(timer_text).alignment(Alignment::Center);
@@ -77,19 +85,5 @@ pub fn handle_key(app: &mut Pomodoro, key: KeyEvent) {
             }
         }
         _ => {}
-    }
-}
-
-fn centered_vertically(area: Rect, height: u16) -> Rect {
-    if height >= area.height {
-        return area;
-    }
-
-    let top_margin = (area.height - height) / 2;
-
-    Rect {
-        y: area.y + top_margin,
-        height,
-        ..area
     }
 }

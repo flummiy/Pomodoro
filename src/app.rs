@@ -3,9 +3,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::settings::SettingsState;
-use crate::timer::TimerState;
-use crate::views;
+use crate::{completion_alert, settings::SettingsState, timer::TimerState, views};
 use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
@@ -95,6 +93,7 @@ impl Pomodoro {
         }
 
         if timer_finished {
+            completion_alert::alert_timer_finished(self.timer.phase);
             self.timer.advance_after_completion(
                 self.settings.work_minutes,
                 self.settings.short_break_minutes,
